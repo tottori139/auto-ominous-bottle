@@ -6,16 +6,20 @@ import net.minecraft.client.gui.screens.TitleScreen;
 
 /**
  * Только для разработки (gradlew runPreview): открывает настройки, по очереди показывает каждую вкладку,
- * сохраняет скриншоты в run/screenshots и закрывает игру. В обычной игре не включается.
+ * сохраняет скриншоты в run/screenshots и закрывает игру. На вкладке анимации снимает ещё и улыбку.
+ * В обычной игре не включается.
  */
 final class AobDevPreview {
 	static final boolean ENABLED = Boolean.getBoolean("autoominousbottle.devPreview");
 
 	private static final int TICKS_PER_SHOT = 20;
+	/** Через сколько тиков после старта анимации бутылочка уже улыбается. */
+	private static final int SMILE_TICKS = 70;
 
 	private static AobConfigScreen screen;
 	private static int ticks;
 	private static int tab;
+	private static boolean smileShot;
 
 	private AobDevPreview() {
 	}
@@ -29,16 +33,28 @@ final class AobDevPreview {
 			}
 			return;
 		}
-		if (++ticks < TICKS_PER_SHOT) return;
-		ticks = 0;
+		ticks++;
+		boolean animationTab = tab == AobConfigScreen.animationTabIndex();
+		if (animationTab && ticks == 1) AobAnimation.playPreview();
+		if (animationTab && !smileShot && ticks == TICKS_PER_SHOT) {
+			shot(mc, "aob_tab_" + tab);
+			smileShot = true;
+			return;
+		}
+		if (ticks < (animationTab ? SMILE_TICKS : TICKS_PER_SHOT)) return;
 
-		Screenshot.grab(mc.gameDirectory, "aob_tab_" + tab + ".png", mc.gameRenderer.mainRenderTarget(), 1, message -> {
-		});
+		shot(mc, animationTab ? "aob_tab_" + tab + "_smile" : "aob_tab_" + tab);
+		ticks = 0;
 		tab++;
 		if (tab < AobConfigScreen.tabCount()) {
 			screen.selectTab(tab);
 		} else {
 			mc.stop();
 		}
+	}
+
+	private static void shot(Minecraft mc, String name) {
+		Screenshot.grab(mc.gameDirectory, name + ".png", mc.gameRenderer.mainRenderTarget(), 1, message -> {
+		});
 	}
 }

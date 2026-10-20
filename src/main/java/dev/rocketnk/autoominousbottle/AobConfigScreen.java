@@ -24,7 +24,7 @@ import java.util.function.IntFunction;
  * Переключатели показывают иконку (галочка/крестик) вместо «ВКЛ/ВЫКЛ».
  */
 public class AobConfigScreen extends Screen {
-	private enum Tab { GENERAL, DRINK, FOOD, JUMP, HUD, SOUNDS }
+	private enum Tab { GENERAL, DRINK, FOOD, JUMP, HUD, ANIMATION, SOUNDS }
 
 	private static final int CONTENT_WIDTH = 300;
 	private static final int BUTTON_HEIGHT = 20;
@@ -101,6 +101,7 @@ public class AobConfigScreen extends Screen {
 			case FOOD -> initFood(config);
 			case JUMP -> initJump(config);
 			case HUD -> initHud(config);
+			case ANIMATION -> initAnimation(config);
 			case SOUNDS -> initSounds(config);
 		}
 
@@ -139,6 +140,10 @@ public class AobConfigScreen extends Screen {
 
 	static int tabCount() {
 		return Tab.values().length;
+	}
+
+	static int animationTabIndex() {
+		return Tab.ANIMATION.ordinal();
 	}
 
 	void selectTab(int index) {
@@ -188,6 +193,21 @@ public class AobConfigScreen extends Screen {
 				scale -> Component.literal(scale + "%"), value -> config.hudScale = value);
 		toggle("hud_compact", () -> config.hudCompact, value -> config.hudCompact = value);
 		toggle("hud_when_off", () -> config.hudWhenOff, value -> config.hudWhenOff = value);
+	}
+
+	private void initAnimation(AobConfig config) {
+		toggle("animation", () -> config.animation, value -> config.animation = value);
+		toggle("animation_on_drink", () -> config.animationOnDrink, value -> config.animationOnDrink = value);
+		if (config.animationPosition == null) config.animationPosition = AobConfig.AnimationPosition.ABOVE_HOTBAR;
+		add(CycleButton.<AobConfig.AnimationPosition>builder(
+						position -> Component.translatable("autoominousbottle.config.anim_pos." + position.name().toLowerCase()), config.animationPosition)
+				.withValues(AobConfig.AnimationPosition.values())
+				.create(left, nextRowY(), CONTENT_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.animation_position"),
+						(button, value) -> config.animationPosition = value));
+		slider("animation_size", 16, 96, 16, config.animationSize,
+				size -> Component.literal(size + " px"), value -> config.animationSize = value);
+		add(Button.builder(Component.translatable("autoominousbottle.config.animation_test"), button -> AobAnimation.playPreview())
+				.bounds(left, nextRowY(), CONTENT_WIDTH, BUTTON_HEIGHT).build());
 	}
 
 	private void initSounds(AobConfig config) {
@@ -258,7 +278,10 @@ public class AobConfigScreen extends Screen {
 	private void extractStatusPanel(GuiGraphicsExtractor graphics) {
 		AobConfig config = AutoOminousBottleClient.config;
 		int iconY = PANEL_TOP + (PANEL_HEIGHT - PANEL_ICON) / 2;
-		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, AobHud.stateIcon(), left + 4, iconY, PANEL_ICON, PANEL_ICON);
+		// Пока идёт анимация (кнопка «Проиграть» или включение мода), она стоит на месте иконки.
+		if (!AobAnimation.extractAt(graphics, left + 4 - 4, iconY - 4, PANEL_ICON + 8)) {
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, AobHud.stateIcon(), left + 4, iconY, PANEL_ICON, PANEL_ICON);
+		}
 
 		Component counts = minecraft.player != null
 				? Component.translatable("autoominousbottle.hud.counts", config.raidsWon, AobController.countBottles(minecraft.player))

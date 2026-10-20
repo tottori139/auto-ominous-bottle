@@ -50,10 +50,12 @@ public class AutoOminousBottleClient implements ClientModInitializer {
 		});
 
 		HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(MOD_ID, "hud"), AobHud::extract);
+		HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(MOD_ID, "animation"), AobAnimation::extract);
 
-		// Иконки 32x и 64x — встроенные ресурспаки, включаются в меню «Пакеты ресурсов».
+		// Встроенные ресурспаки в меню «Пакеты ресурсов»: иконки и анимация 32x/64x
+		// и анимированная зловещая бутылка в инвентаре.
 		ModContainer mod = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow();
-		for (String pack : new String[] {"icons_32x", "icons_64x"}) {
+		for (String pack : new String[] {"icons_32x", "icons_64x", "animated_item"}) {
 			ResourceLoader.registerBuiltinPack(Identifier.fromNamespaceAndPath(MOD_ID, pack), mod,
 					Component.translatable("autoominousbottle.pack." + pack), PackActivationType.NORMAL);
 		}
@@ -77,6 +79,7 @@ public class AutoOminousBottleClient implements ClientModInitializer {
 		AobController.reset();
 		AobController.say(message);
 		AobSounds.play(enabled ? AobSounds.ENABLE : AobSounds.DISABLE);
+		if (enabled) AobAnimation.play();
 	}
 
 	/** Выключение сразу, включение — только вторым нажатием, чтобы не выпить бутылку случайно. */

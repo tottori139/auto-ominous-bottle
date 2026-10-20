@@ -11,6 +11,8 @@ import java.nio.file.Path;
 public class AobConfig {
 	public enum HudCorner { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT }
 
+	public enum AnimationPosition { ABOVE_HOTBAR, CENTER, TOP }
+
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("autoominousbottle.json");
 
@@ -23,6 +25,13 @@ public class AobConfig {
 	public boolean lowHealthDisable = true;
 	public int lowHealth = 6;
 	public boolean exitWhenOutOfBottles = false;
+	/** Бутылочка с глазами при включении мода. */
+	public boolean animation = true;
+	/** И ещё каждый раз, когда мод начинает пить бутылку. */
+	public boolean animationOnDrink = true;
+	public AnimationPosition animationPosition = AnimationPosition.ABOVE_HOTBAR;
+	/** Размер на экране в пикселях интерфейса. */
+	public int animationSize = 32;
 	public boolean sounds = true;
 	/** Громкость звуков мода в процентах. */
 	public int soundVolume = 100;

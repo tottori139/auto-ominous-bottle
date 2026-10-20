@@ -307,6 +307,7 @@ public final class AobController {
 
 		using = action;
 		usingTicks = 0;
+		if (action == Action.DRINK && AutoOminousBottleClient.config.animationOnDrink) AobAnimation.play();
 		state = action == Action.DRINK ? State.DRINKING : State.EATING;
 	}
 
