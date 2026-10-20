@@ -13,6 +13,10 @@ public class AobConfig {
 	private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("autoominousbottle.json");
 
 	public boolean enabled = false;
+	/** Включать клавишей только по второму нажатию. */
+	public boolean confirmEnable = true;
+	/** Выключать мод после перезахода, смены измерения и смерти. */
+	public boolean autoDisable = true;
 	public boolean autoDrink = true;
 	public boolean autoEat = true;
 	public boolean showHud = true;

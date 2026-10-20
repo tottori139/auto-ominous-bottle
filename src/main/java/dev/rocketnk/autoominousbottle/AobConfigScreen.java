@@ -44,6 +44,13 @@ public class AobConfigScreen extends Screen {
 		place(CycleButton.onOffBuilder(config.showHud)
 				.create(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.hud"), (button, value) -> config.showHud = value));
 
+		place(CycleButton.onOffBuilder(config.confirmEnable)
+				.withTooltip(value -> Tooltip.create(Component.translatable("autoominousbottle.config.confirm_enable.tip")))
+				.create(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.confirm_enable"), (button, value) -> config.confirmEnable = value));
+		place(CycleButton.onOffBuilder(config.autoDisable)
+				.withTooltip(value -> Tooltip.create(Component.translatable("autoominousbottle.config.auto_disable.tip")))
+				.create(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.auto_disable"), (button, value) -> config.autoDisable = value));
+
 		place(CycleButton.onOffBuilder(config.autoDrink)
 				.create(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.auto_drink"), (button, value) -> config.autoDrink = value));
 		place(CycleButton.<Integer>builder(seconds -> Component.translatable("autoominousbottle.config.seconds", seconds), config.drinkDelaySeconds)
