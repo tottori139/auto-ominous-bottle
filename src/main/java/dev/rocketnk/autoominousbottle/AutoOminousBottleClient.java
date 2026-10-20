@@ -95,8 +95,7 @@ public class AutoOminousBottleClient implements ClientModInitializer {
 		}
 		confirmTicksLeft = CONFIRM_TICKS;
 		AobSounds.play(AobSounds.CONFIRM);
-		client.gui.hud.setOverlayMessage(
-				Component.translatable("autoominousbottle.msg.confirm", toggleKey.getTranslatedKeyMessage()), false);
+		AobHud.showMessage(Component.translatable("autoominousbottle.msg.confirm", toggleKey.getTranslatedKeyMessage()));
 	}
 
 	/** После перезахода, смены измерения или смерти мод выключается, если это не отключено в настройках. */

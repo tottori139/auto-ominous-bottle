@@ -1,6 +1,7 @@
 package dev.rocketnk.autoominousbottle;
 
 import dev.rocketnk.autoominousbottle.mixin.BossHealthOverlayAccessor;
+import dev.rocketnk.autoominousbottle.mixin.MinecraftAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -37,6 +38,8 @@ public final class AobController {
 	private static final int MAX_FAILED_DRINKS = 2;
 	private static final int MAX_USE_TICKS = 100;
 	private static final int JUMP_PRESS_TICKS = 2;
+	/** Задержка ПКМ, которую выставляем каждый тик, пока мод пьёт или ест. */
+	private static final int USE_REPEAT_BLOCK_TICKS = 4;
 	/** Сколько ждём после «бутылки кончились», прежде чем выйти из мира. */
 	private static final int EXIT_DELAY_TICKS = 200;
 
@@ -211,7 +214,7 @@ public final class AobController {
 
 	public static void say(Component message) {
 		LocalPlayer player = Minecraft.getInstance().player;
-		if (player != null) player.sendSystemMessage(message);
+		if (player != null) AobHud.showMessage(message);
 	}
 
 	/** Прыгаем, пока есть знамение, а рейд ещё не начался: на некоторых фермах иначе рейд не стартует. */
@@ -303,6 +306,7 @@ public final class AobController {
 		restoreSlot = inventory.getSelectedSlot();
 		inventory.setSelectedSlot(hotbarSlot);
 		mc.gameMode.useItem(player, InteractionHand.MAIN_HAND);
+		blockUseRepeat(mc);
 		mc.options.keyUse.setDown(true);
 
 		using = action;
@@ -321,7 +325,12 @@ public final class AobController {
 	/** Держим ПКМ, пока предмет не съеден или не выпит. */
 	private static void continueUsing(Minecraft mc, LocalPlayer player) {
 		usingTicks++;
-		if (player.isUsingItem() && usingTicks < MAX_USE_TICKS) {
+		// Сервер сообщает «выпито» в начале тика, а ПКМ у нас ещё зажата — без задержки игра сразу
+		// начала бы пить следующую бутылку из той же стопки. Поэтому держим задержку ПКМ ненулевой.
+		blockUseRepeat(mc);
+		// Знамение уже есть — значит бутылка выпита, больше не пьём.
+		boolean omenArrived = using == Action.DRINK && hasOmen(player);
+		if (player.isUsingItem() && !omenArrived && usingTicks < MAX_USE_TICKS) {
 			mc.options.keyUse.setDown(true);
 			return;
 		}
@@ -334,7 +343,12 @@ public final class AobController {
 		}
 	}
 
+	private static void blockUseRepeat(Minecraft mc) {
+		((MinecraftAccessor) mc).aob$setRightClickDelay(USE_REPEAT_BLOCK_TICKS);
+	}
+
 	private static void stopUsing(Minecraft mc, LocalPlayer player) {
+		blockUseRepeat(mc);
 		mc.options.keyUse.setDown(false);
 		if (player.isUsingItem()) mc.gameMode.releaseUsingItem(player);
 		if (restoreSlot >= 0) player.getInventory().setSelectedSlot(restoreSlot);
@@ -343,7 +357,7 @@ public final class AobController {
 	}
 
 	private static void warn(LocalPlayer player, Component message) {
-		player.sendSystemMessage(message);
+		AobHud.showMessage(message);
 		AobSounds.play(AobSounds.WARNING);
 	}
 }
