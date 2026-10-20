@@ -71,16 +71,28 @@ public class AobConfigScreen extends Screen {
 				.build();
 		toggles.add(new Toggle(addRenderableWidget(main), () -> config.enabled));
 
+		// Ширина вкладки — по длине названия, остаток делим поровну: «Основное» длиннее «Еды».
 		Tab[] tabs = Tab.values();
-		int tabWidth = (CONTENT_WIDTH - (tabs.length - 1) * TAB_GAP) / tabs.length;
+		Component[] labels = new Component[tabs.length];
+		int textTotal = 0;
+		for (int i = 0; i < tabs.length; i++) {
+			labels[i] = Component.translatable("autoominousbottle.tab." + tabs[i].name().toLowerCase());
+			textTotal += font.width(labels[i]);
+		}
+		int spare = Math.max(0, CONTENT_WIDTH - (tabs.length - 1) * TAB_GAP - textTotal);
+		int x = left;
 		for (int i = 0; i < tabs.length; i++) {
 			Tab target = tabs[i];
-			Button button = Button.builder(Component.translatable("autoominousbottle.tab." + target.name().toLowerCase()), b -> {
+			int tabWidth = i == tabs.length - 1
+					? left + CONTENT_WIDTH - x
+					: font.width(labels[i]) + spare / tabs.length;
+			Button button = Button.builder(labels[i], b -> {
 				tab = target;
 				rebuildWidgets();
-			}).bounds(left + i * (tabWidth + TAB_GAP), TABS_TOP, tabWidth, BUTTON_HEIGHT).build();
+			}).bounds(x, TABS_TOP, tabWidth, BUTTON_HEIGHT).build();
 			button.active = target != tab;
 			addRenderableWidget(button);
+			x += tabWidth + TAB_GAP;
 		}
 
 		switch (tab) {
@@ -131,7 +143,8 @@ public class AobConfigScreen extends Screen {
 
 	void selectTab(int index) {
 		tab = Tab.values()[index];
-		if (minecraft != null) rebuildWidgets();
+		// До первого init() у экрана нулевой размер: кнопки встали бы за край и рендер упал бы.
+		if (width > 0) rebuildWidgets();
 	}
 
 	private Component resetLabel(AobConfig config) {
@@ -234,10 +247,16 @@ public class AobConfigScreen extends Screen {
 		}
 	}
 
+	@Override
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+		super.extractBackground(graphics, mouseX, mouseY, partialTick);
+		// Подложка панели статуса — в фоне, чтобы не затемнять кнопку «Мод» поверх.
+		graphics.fill(left, PANEL_TOP, left + CONTENT_WIDTH, PANEL_TOP + PANEL_HEIGHT, 0x90000000);
+	}
+
 	/** Панель статуса: большая иконка состояния, что мод делает сейчас и счётчики. */
 	private void extractStatusPanel(GuiGraphicsExtractor graphics) {
 		AobConfig config = AutoOminousBottleClient.config;
-		graphics.fill(left, PANEL_TOP, left + CONTENT_WIDTH, PANEL_TOP + PANEL_HEIGHT, 0x90000000);
 		int iconY = PANEL_TOP + (PANEL_HEIGHT - PANEL_ICON) / 2;
 		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, AobHud.stateIcon(), left + 4, iconY, PANEL_ICON, PANEL_ICON);
 

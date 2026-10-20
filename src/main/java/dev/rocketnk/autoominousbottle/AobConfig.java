@@ -33,7 +33,7 @@ public class AobConfig {
 	/** Только иконка, без текста. */
 	public boolean hudCompact = false;
 	/** Показывать иконку «выключен», когда мод выключен. */
-	public boolean hudWhenOff = true;
+	public boolean hudWhenOff = false;
 	/** Масштаб HUD в процентах. */
 	public int hudScale = 100;
 	public boolean autoJump = false;
