@@ -1,4 +1,6 @@
 {
+	"modmenu.summaryTranslation.autoominousbottle": "Пьёт зловещую бутылку после каждого рейда. Для AFK на рейд-ферме.",
+	"modmenu.descriptionTranslation.autoominousbottle": "Пьёт зловещую бутылку после каждого рейда, ест когда голоден, может прыгать до начала рейда и считает пройденные рейды. Для AFK на рейд-ферме.",
 	"key.category.autoominousbottle.main": "Auto Ominous Bottle",
 	"key.autoominousbottle.toggle": "Вкл/выкл Auto Ominous Bottle",
 	"autoominousbottle.config.title": "Настройки Auto Ominous Bottle",

@@ -3,7 +3,7 @@
 	"id": "autoominousbottle",
 	"version": "${version}",
 	"name": "Auto Ominous Bottle",
-	"description": "Пьёт зловещую бутылку после конца рейда, ест когда голоден и считает рейды. Для AFK на рейд-ферме.",
+	"description": "Drinks an Ominous Bottle after every raid, eats when hungry and counts won raids. For AFK raid farms.",
 	"authors": ["rocketnk"],
 	"license": "MIT",
 	"environment": "client",

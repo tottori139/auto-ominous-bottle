@@ -1,4 +1,6 @@
 {
+	"modmenu.summaryTranslation.autoominousbottle": "Drinks an Ominous Bottle after every raid. For AFK raid farms.",
+	"modmenu.descriptionTranslation.autoominousbottle": "Drinks an Ominous Bottle after every raid, eats when hungry, can jump until the raid starts and counts won raids. For AFK raid farms.",
 	"key.category.autoominousbottle.main": "Auto Ominous Bottle",
 	"key.autoominousbottle.toggle": "Toggle Auto Ominous Bottle",
 	"autoominousbottle.config.title": "Auto Ominous Bottle settings",
