@@ -1,0 +1,26 @@
+{
+	"enable": {
+		"subtitle": "subtitles.autoominousbottle.enable",
+		"sounds": [{ "name": "minecraft:block.beacon.activate", "type": "event" }]
+	},
+	"disable": {
+		"subtitle": "subtitles.autoominousbottle.disable",
+		"sounds": [{ "name": "minecraft:block.beacon.deactivate", "type": "event" }]
+	},
+	"confirm": {
+		"subtitle": "subtitles.autoominousbottle.confirm",
+		"sounds": [{ "name": "minecraft:block.amethyst_block.chime", "type": "event" }]
+	},
+	"raid_won": {
+		"subtitle": "subtitles.autoominousbottle.raid_won",
+		"sounds": [{ "name": "minecraft:ui.toast.challenge_complete", "type": "event" }]
+	},
+	"warning": {
+		"subtitle": "subtitles.autoominousbottle.warning",
+		"sounds": [{ "name": "minecraft:block.bell.use", "type": "event" }]
+	},
+	"danger": {
+		"subtitle": "subtitles.autoominousbottle.danger",
+		"sounds": [{ "name": "minecraft:block.anvil.land", "type": "event" }]
+	}
+}

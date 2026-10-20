@@ -64,6 +64,7 @@ public class AutoOminousBottleClient implements ClientModInitializer {
 		config.save();
 		AobController.reset();
 		AobController.say(message);
+		AobSounds.play(enabled ? AobSounds.ENABLE : AobSounds.DISABLE);
 	}
 
 	/** Выключение сразу, включение — только вторым нажатием, чтобы не выпить бутылку случайно. */
@@ -78,6 +79,7 @@ public class AutoOminousBottleClient implements ClientModInitializer {
 			return;
 		}
 		confirmTicksLeft = CONFIRM_TICKS;
+		AobSounds.play(AobSounds.CONFIRM);
 		client.gui.hud.setOverlayMessage(
 				Component.translatable("autoominousbottle.msg.confirm", toggleKey.getTranslatedKeyMessage()), false);
 	}

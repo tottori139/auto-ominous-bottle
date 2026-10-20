@@ -21,6 +21,9 @@ public class AobConfig {
 	public boolean lowHealthDisable = true;
 	public int lowHealth = 6;
 	public boolean exitWhenOutOfBottles = false;
+	public boolean sounds = true;
+	/** Громкость звуков мода в процентах. */
+	public int soundVolume = 100;
 	public boolean autoDrink = true;
 	public boolean autoEat = true;
 	public boolean showHud = true;

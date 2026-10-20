@@ -17,6 +17,7 @@ public class AobConfigScreen extends Screen {
 	private static final List<Integer> EAT_THRESHOLDS = List.of(6, 10, 14, 18);
 	private static final List<Integer> JUMP_INTERVALS = List.of(0, 1, 3, 5);
 	private static final List<Integer> LOW_HEALTH_VALUES = List.of(4, 6, 8, 10, 14);
+	private static final List<Integer> VOLUMES = List.of(25, 50, 75, 100);
 	private static final int BUTTON_WIDTH = 150;
 	private static final int BUTTON_HEIGHT = 20;
 	private static final int COLUMN_GAP = 10;
@@ -38,6 +39,7 @@ public class AobConfigScreen extends Screen {
 		if (!EAT_THRESHOLDS.contains(config.eatBelowFood)) config.eatBelowFood = 14;
 		if (!JUMP_INTERVALS.contains(config.jumpIntervalSeconds)) config.jumpIntervalSeconds = 1;
 		if (!LOW_HEALTH_VALUES.contains(config.lowHealth)) config.lowHealth = 6;
+		if (!VOLUMES.contains(config.soundVolume)) config.soundVolume = 100;
 		slot = 0;
 
 		// Слева: что делает мод. Справа: его параметры.
@@ -80,6 +82,15 @@ public class AobConfigScreen extends Screen {
 		place(CycleButton.<Integer>builder(hp -> Component.translatable("autoominousbottle.config.hearts", hp / 2), config.lowHealth)
 				.withValues(LOW_HEALTH_VALUES)
 				.create(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.low_health"), (button, value) -> config.lowHealth = value));
+
+		place(CycleButton.onOffBuilder(config.sounds)
+				.create(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.sounds"), (button, value) -> config.sounds = value));
+		place(CycleButton.<Integer>builder(volume -> Component.literal(volume + "%"), config.soundVolume)
+				.withValues(VOLUMES)
+				.create(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.volume"), (button, value) -> {
+					config.soundVolume = value;
+					AobSounds.play(AobSounds.CONFIRM);
+				}));
 
 		place(CycleButton.onOffBuilder(config.exitWhenOutOfBottles)
 				.withTooltip(value -> Tooltip.create(Component.translatable("autoominousbottle.config.exit_no_bottles.tip")))

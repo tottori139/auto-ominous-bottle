@@ -8,7 +8,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Inventory;
@@ -126,7 +125,7 @@ public final class AobController {
 
 		if (config.lowHealthDisable && player.getHealth() <= config.lowHealth && !player.isDeadOrDying()) {
 			AutoOminousBottleClient.disable(Component.translatable("autoominousbottle.msg.off_low_health"));
-			warn(player, null);
+			AobSounds.play(AobSounds.DANGER);
 			return;
 		}
 
@@ -264,7 +263,10 @@ public final class AobController {
 			if (hasTranslationKey(name, "event.minecraft.raid.victory") && countedVictories.add(entry.getKey())) {
 				config.raidsWon++;
 				config.save();
-				if (config.enabled) say(Component.translatable("autoominousbottle.msg.raid_won", config.raidsWon));
+				if (config.enabled) {
+					say(Component.translatable("autoominousbottle.msg.raid_won", config.raidsWon));
+					AobSounds.play(AobSounds.RAID_WON);
+				}
 			}
 		}
 		countedVictories.retainAll(events.keySet());
@@ -340,7 +342,7 @@ public final class AobController {
 	}
 
 	private static void warn(LocalPlayer player, Component message) {
-		if (message != null) player.sendSystemMessage(message);
-		player.playSound(SoundEvents.NOTE_BLOCK_PLING.value(), 1.0F, 0.6F);
+		player.sendSystemMessage(message);
+		AobSounds.play(AobSounds.WARNING);
 	}
 }
