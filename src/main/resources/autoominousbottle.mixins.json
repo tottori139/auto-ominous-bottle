@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "dev.rocketnk.autoominousbottle.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"BossHealthOverlayAccessor"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
