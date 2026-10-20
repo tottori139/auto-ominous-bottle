@@ -47,3 +47,14 @@ loom {
 		}
 	}
 }
+
+// gradlew runClientGameTest — клиентские тесты в настоящем мире: еда, одна бутылка, возврат меча, прыжок.
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = "autoominousbottle-test"
+		enableGameTests = false
+		enableClientGameTests = true
+		eula = true
+	}
+}

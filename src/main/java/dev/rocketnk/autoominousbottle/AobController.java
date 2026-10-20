@@ -61,6 +61,8 @@ public final class AobController {
 	private static Action using;
 	private static int usingTicks;
 	private static int restoreSlot = -1;
+	private static int swappedInventorySlot = -1;
+	private static int swappedHotbarSlot = -1;
 
 	private static boolean jumping;
 	private static int jumpTicks;
@@ -106,6 +108,8 @@ public final class AobController {
 		if (player == null || mc.gameMode == null) {
 			using = null;
 			restoreSlot = -1;
+			swappedInventorySlot = -1;
+			swappedHotbarSlot = -1;
 			jumping = false;
 			raidBarVisible = false;
 			countedVictories.clear();
@@ -217,10 +221,13 @@ public final class AobController {
 		if (player != null) AobHud.showMessage(message);
 	}
 
-	/** Прыгаем, пока есть знамение, а рейд ещё не начался: на некоторых фермах иначе рейд не стартует. */
+	/**
+	 * Прыгаем, пока есть «Дурное знамение»: на некоторых фермах без прыжка оно не превращается в «Знамение рейда».
+	 * Как только появилось «Знамение рейда» — рейд уже запущен, прыгать хватит.
+	 */
 	private static void tickJump(Minecraft mc, LocalPlayer player, AobConfig config) {
 		boolean wanted = config.enabled && config.autoJump && using == null && mc.gui.screen() == null
-				&& !raidBarVisible && hasOmen(player);
+				&& !raidBarVisible && player.hasEffect(MobEffects.BAD_OMEN) && !player.hasEffect(MobEffects.RAID_OMEN);
 		if (!wanted) {
 			if (jumping) mc.options.keyJump.setDown(false);
 			jumping = false;
@@ -299,8 +306,10 @@ public final class AobController {
 		int hotbarSlot = inventorySlot;
 		if (inventorySlot >= HOTBAR_SIZE) {
 			hotbarSlot = freeHotbarSlot(inventory);
-			// Слоты 9..35 инвентаря совпадают с номерами слотов в меню игрока.
-			mc.gameMode.handleContainerInput(player.inventoryMenu.containerId, inventorySlot, hotbarSlot, ContainerInput.SWAP, player);
+			swap(mc, player, inventorySlot, hotbarSlot);
+			// Запоминаем, чтобы после глотка вернуть предметы на свои места (меч — обратно в хотбар).
+			swappedInventorySlot = inventorySlot;
+			swappedHotbarSlot = hotbarSlot;
 		}
 
 		restoreSlot = inventory.getSelectedSlot();
@@ -315,11 +324,18 @@ public final class AobController {
 		state = action == Action.DRINK ? State.DRINKING : State.EATING;
 	}
 
+	/** Пустой слот хотбара, иначе последний слот, который сейчас не в руке. */
 	private static int freeHotbarSlot(Inventory inventory) {
 		for (int i = 0; i < HOTBAR_SIZE; i++) {
 			if (inventory.getItem(i).isEmpty()) return i;
 		}
-		return inventory.getSelectedSlot();
+		int selected = inventory.getSelectedSlot();
+		return selected == HOTBAR_SIZE - 1 ? HOTBAR_SIZE - 2 : HOTBAR_SIZE - 1;
+	}
+
+	/** Меняет местами слот инвентаря (9..35, совпадает с номером в меню игрока) и слот хотбара. */
+	private static void swap(Minecraft mc, LocalPlayer player, int inventorySlot, int hotbarSlot) {
+		mc.gameMode.handleContainerInput(player.inventoryMenu.containerId, inventorySlot, hotbarSlot, ContainerInput.SWAP, player);
 	}
 
 	/** Держим ПКМ, пока предмет не съеден или не выпит. */
@@ -353,6 +369,12 @@ public final class AobController {
 		if (player.isUsingItem()) mc.gameMode.releaseUsingItem(player);
 		if (restoreSlot >= 0) player.getInventory().setSelectedSlot(restoreSlot);
 		restoreSlot = -1;
+		if (swappedInventorySlot >= 0) {
+			// Остаток бутылок уходит обратно в инвентарь, а что лежало в хотбаре — возвращается.
+			swap(mc, player, swappedInventorySlot, swappedHotbarSlot);
+			swappedInventorySlot = -1;
+			swappedHotbarSlot = -1;
+		}
 		using = null;
 	}
 
