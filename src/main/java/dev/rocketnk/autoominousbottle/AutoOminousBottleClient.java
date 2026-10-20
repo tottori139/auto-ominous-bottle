@@ -46,6 +46,7 @@ public class AutoOminousBottleClient implements ClientModInitializer {
 			}
 			checkAutoDisable(client);
 			AobController.tick(client);
+			if (AobDevPreview.ENABLED) AobDevPreview.tick(client);
 		});
 
 		HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(MOD_ID, "hud"), AobHud::extract);

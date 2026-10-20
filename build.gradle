@@ -36,3 +36,14 @@ java {
 	sourceCompatibility = JavaVersion.VERSION_25
 	targetCompatibility = JavaVersion.VERSION_25
 }
+
+// gradlew runPreview — открывает настройки мода и сохраняет скриншоты всех вкладок в run/screenshots.
+loom {
+	runs {
+		preview {
+			client()
+			name = "Preview"
+			vmArg "-Dautoominousbottle.devPreview=true"
+		}
+	}
+}
