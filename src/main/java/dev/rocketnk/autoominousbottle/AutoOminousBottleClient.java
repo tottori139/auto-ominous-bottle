@@ -5,6 +5,10 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
+import net.fabricmc.fabric.api.resource.v1.pack.PackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -45,6 +49,13 @@ public class AutoOminousBottleClient implements ClientModInitializer {
 		});
 
 		HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(MOD_ID, "hud"), AobHud::extract);
+
+		// Иконки 32x и 64x — встроенные ресурспаки, включаются в меню «Пакеты ресурсов».
+		ModContainer mod = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow();
+		for (String pack : new String[] {"icons_32x", "icons_64x"}) {
+			ResourceLoader.registerBuiltinPack(Identifier.fromNamespaceAndPath(MOD_ID, pack), mod,
+					Component.translatable("autoominousbottle.pack." + pack), PackActivationType.NORMAL);
+		}
 	}
 
 	public static KeyMapping toggleKey() {

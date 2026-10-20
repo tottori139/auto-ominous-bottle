@@ -6,6 +6,7 @@
 	"description": "Drinks an Ominous Bottle after every raid, eats when hungry and counts won raids. For AFK raid farms.",
 	"authors": ["rocketnk"],
 	"license": "MIT",
+	"icon": "assets/autoominousbottle/icon.png",
 	"environment": "client",
 	"entrypoints": {
 		"client": ["dev.rocketnk.autoominousbottle.AutoOminousBottleClient"],

@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class AobConfig {
+	public enum HudCorner { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT }
+
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("autoominousbottle.json");
 
@@ -27,6 +29,13 @@ public class AobConfig {
 	public boolean autoDrink = true;
 	public boolean autoEat = true;
 	public boolean showHud = true;
+	public HudCorner hudCorner = HudCorner.TOP_LEFT;
+	/** Только иконка, без текста. */
+	public boolean hudCompact = false;
+	/** Показывать иконку «выключен», когда мод выключен. */
+	public boolean hudWhenOff = true;
+	/** Масштаб HUD в процентах. */
+	public int hudScale = 100;
 	public boolean autoJump = false;
 	/** 0 — держать прыжок постоянно. */
 	public int jumpIntervalSeconds = 1;
