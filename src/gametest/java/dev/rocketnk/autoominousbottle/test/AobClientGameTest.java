@@ -42,7 +42,43 @@ public class AobClientGameTest implements FabricClientGameTest {
 			testAutoEat(context, server);
 			testDrinksOneBottle(context, server);
 			testJumpStopsOnRaidOmen(context, server);
+			screenshotHud(context, server);
 		}
+	}
+
+	/** Снимки HUD в разных видах и местах — смотреть глазами в run/screenshots. */
+	private void screenshotHud(ClientGameTestContext context, TestServerContext server) {
+		server.runOnServer(s -> {
+			fillHotbar(player(s));
+			player(s).getInventory().setItem(BOTTLE_SLOT, new ItemStack(Items.OMINOUS_BOTTLE, 7));
+			player(s).addEffect(new MobEffectInstance(MobEffects.BAD_OMEN, 2400));
+		});
+		configure(context, config -> {
+			config.autoDrink = true;
+			config.autoEat = false;
+		});
+		enable(context);
+		record Variant(String name, AobConfig.HudStyle style, AobConfig.HudPosition position) {
+		}
+		for (Variant variant : new Variant[] {
+				new Variant("full_top_left", AobConfig.HudStyle.FULL, AobConfig.HudPosition.TOP_LEFT),
+				new Variant("full_middle_right", AobConfig.HudStyle.FULL, AobConfig.HudPosition.MIDDLE_RIGHT),
+				new Variant("icon_bottom_center", AobConfig.HudStyle.ICON, AobConfig.HudPosition.BOTTOM_CENTER),
+				new Variant("text", AobConfig.HudStyle.TEXT, AobConfig.HudPosition.TOP_LEFT)}) {
+			context.runOnClient(mc -> {
+				AutoOminousBottleClient.config.hudStyle = variant.style();
+				AutoOminousBottleClient.config.hudPosition = variant.position();
+				dev.rocketnk.autoominousbottle.AobHud.showMessage(net.minecraft.network.chat.Component.literal("Рейд пройден, всего 3"));
+			});
+			context.waitTicks(5);
+			context.takeScreenshot("aob_hud_" + variant.name());
+		}
+		context.runOnClient(mc -> {
+			AutoOminousBottleClient.config.hudStyle = AobConfig.HudStyle.FULL;
+			AutoOminousBottleClient.config.hudPosition = AobConfig.HudPosition.TOP_LEFT;
+		});
+		server.runOnServer(s -> player(s).removeAllEffects());
+		disable(context);
 	}
 
 	/** Голод 4, хлеб в инвентаре, хотбар забит, меч в руке: мод ест до порога и всё возвращает на места. */

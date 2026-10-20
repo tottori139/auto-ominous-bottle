@@ -183,16 +183,37 @@ public class AobConfigScreen extends Screen {
 
 	private void initHud(AobConfig config) {
 		toggle("hud", () -> config.showHud, value -> config.showHud = value);
-		if (config.hudCorner == null) config.hudCorner = AobConfig.HudCorner.TOP_LEFT;
-		add(CycleButton.<AobConfig.HudCorner>builder(
-						corner -> Component.translatable("autoominousbottle.config.corner." + corner.name().toLowerCase()), config.hudCorner)
-				.withValues(AobConfig.HudCorner.values())
-				.create(left, nextRowY(), CONTENT_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.hud_corner"),
-						(button, value) -> config.hudCorner = value));
+		if (config.hudStyle == null) config.hudStyle = AobConfig.HudStyle.FULL;
+		if (config.hudPosition == null) config.hudPosition = AobConfig.HudPosition.TOP_LEFT;
+		if (config.animations == null) config.animations = AobConfig.Animations.ON;
+
+		int styleY = nextRowY();
+		CycleButton<AobConfig.HudPosition> position = add(CycleButton.<AobConfig.HudPosition>builder(
+						value -> Component.translatable("autoominousbottle.config.hud_position." + value.name().toLowerCase()), config.hudPosition)
+				.withValues(AobConfig.HudPosition.values())
+				.create(left, nextRowY(), CONTENT_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.hud_position"),
+						(button, value) -> config.hudPosition = value));
+		// В стиле «только текст» строка всегда над хотбаром, место не выбирается.
+		position.active = config.hudStyle != AobConfig.HudStyle.TEXT;
+		add(CycleButton.<AobConfig.HudStyle>builder(
+						value -> Component.translatable("autoominousbottle.config.hud_style." + value.name().toLowerCase()), config.hudStyle)
+				.withValues(AobConfig.HudStyle.values())
+				.withTooltip(value -> Tooltip.create(Component.translatable("autoominousbottle.config.hud_style." + value.name().toLowerCase() + ".tip")))
+				.create(left, styleY, CONTENT_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.hud_style"),
+						(button, value) -> {
+							config.hudStyle = value;
+							position.active = value != AobConfig.HudStyle.TEXT;
+						}));
+
 		slider("hud_scale", 50, 200, 25, config.hudScale,
 				scale -> Component.literal(scale + "%"), value -> config.hudScale = value);
-		toggle("hud_compact", () -> config.hudCompact, value -> config.hudCompact = value);
 		toggle("hud_when_off", () -> config.hudWhenOff, value -> config.hudWhenOff = value);
+		add(CycleButton.<AobConfig.Animations>builder(
+						value -> Component.translatable("autoominousbottle.config.animations." + value.name().toLowerCase()), config.animations)
+				.withValues(AobConfig.Animations.values())
+				.withTooltip(value -> Tooltip.create(Component.translatable("autoominousbottle.config.animations.tip")))
+				.create(left, nextRowY(), CONTENT_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.animations"),
+						(button, value) -> config.animations = value));
 	}
 
 	private void initAnimation(AobConfig config) {
@@ -262,8 +283,8 @@ public class AobConfigScreen extends Screen {
 		extractStatusPanel(graphics);
 		for (Toggle toggle : toggles) {
 			Button button = toggle.button();
-			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, AobHud.icon(toggle.state().getAsBoolean() ? "toggle_on" : "toggle_off"),
-					button.getRight() - TOGGLE_ICON - 2, button.getY() + (BUTTON_HEIGHT - TOGGLE_ICON) / 2, TOGGLE_ICON, TOGGLE_ICON);
+			AobIcons.draw(graphics, toggle.state().getAsBoolean() ? "toggle_on" : "toggle_off",
+					button.getRight() - TOGGLE_ICON - 2, button.getY() + (BUTTON_HEIGHT - TOGGLE_ICON) / 2, TOGGLE_ICON);
 		}
 	}
 
@@ -280,7 +301,7 @@ public class AobConfigScreen extends Screen {
 		int iconY = PANEL_TOP + (PANEL_HEIGHT - PANEL_ICON) / 2;
 		// Пока идёт анимация (кнопка «Проиграть» или включение мода), она стоит на месте иконки.
 		if (!AobAnimation.extractAt(graphics, left + 4 - 4, iconY - 4, PANEL_ICON + 8)) {
-			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, AobHud.stateIcon(), left + 4, iconY, PANEL_ICON, PANEL_ICON);
+			AobIcons.draw(graphics, AobHud.stateIcon(), left + 4, iconY, PANEL_ICON);
 		}
 
 		Component counts = minecraft.player != null

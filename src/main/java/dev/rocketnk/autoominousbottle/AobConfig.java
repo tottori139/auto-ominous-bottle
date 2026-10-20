@@ -3,13 +3,24 @@ package dev.rocketnk.autoominousbottle;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.GraphicsPreset;
+import net.minecraft.client.Minecraft;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class AobConfig {
-	public enum HudCorner { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT }
+	/** Где стоит иконка статуса: 4 угла и 4 середины краёв экрана. */
+	public enum HudPosition {
+		TOP_LEFT, TOP_CENTER, TOP_RIGHT, MIDDLE_LEFT, MIDDLE_RIGHT, BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT
+	}
+
+	/** FULL — иконка и текст, ICON — только иконка, TEXT — одна строка над хотбаром без иконки. */
+	public enum HudStyle { FULL, ICON, TEXT }
+
+	/** AUTO — анимации выключены, когда в настройках графики стоит «Быстрая». */
+	public enum Animations { ON, OFF, AUTO }
 
 	public enum AnimationPosition { ABOVE_HOTBAR, CENTER, TOP }
 
@@ -38,9 +49,10 @@ public class AobConfig {
 	public boolean autoDrink = true;
 	public boolean autoEat = true;
 	public boolean showHud = true;
-	public HudCorner hudCorner = HudCorner.TOP_LEFT;
-	/** Только иконка, без текста. */
-	public boolean hudCompact = false;
+	public HudPosition hudPosition = HudPosition.TOP_LEFT;
+	public HudStyle hudStyle = HudStyle.FULL;
+	/** Анимация иконок и бутылочки. Выключенные — иконки стоят на первом кадре. */
+	public Animations animations = Animations.ON;
 	/** Показывать иконку «выключен», когда мод выключен. */
 	public boolean hudWhenOff = false;
 	/** Масштаб HUD в процентах. */
@@ -51,6 +63,14 @@ public class AobConfig {
 	public int drinkDelaySeconds = 5;
 	public int eatBelowFood = 14;
 	public int raidsWon = 0;
+
+	public boolean animationsActive() {
+		return switch (animations == null ? Animations.ON : animations) {
+			case ON -> true;
+			case OFF -> false;
+			case AUTO -> Minecraft.getInstance().options.graphicsPreset().get() != GraphicsPreset.FAST;
+		};
+	}
 
 	public static AobConfig load() {
 		if (Files.exists(PATH)) {

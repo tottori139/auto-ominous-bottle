@@ -14,6 +14,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +56,9 @@ public class AutoOminousBottleClient implements ClientModInitializer {
 
 		// Встроенные ресурспаки в меню «Пакеты ресурсов»: иконки и анимация 32x/64x
 		// и анимированная зловещая бутылка в инвентаре.
+		ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(Identifier.fromNamespaceAndPath(MOD_ID, "icons"),
+				(ResourceManagerReloadListener) resources -> AobIcons.clearCache());
+
 		ModContainer mod = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow();
 		for (String pack : new String[] {"icons_32x", "icons_64x", "animated_item"}) {
 			ResourceLoader.registerBuiltinPack(Identifier.fromNamespaceAndPath(MOD_ID, pack), mod,
