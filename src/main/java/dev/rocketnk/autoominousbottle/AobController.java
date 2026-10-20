@@ -3,6 +3,7 @@ package dev.rocketnk.autoominousbottle;
 import dev.rocketnk.autoominousbottle.mixin.BossHealthOverlayAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.LerpingBossEvent;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -37,6 +38,8 @@ public final class AobController {
 	private static final int MAX_FAILED_DRINKS = 2;
 	private static final int MAX_USE_TICKS = 100;
 	private static final int JUMP_PRESS_TICKS = 2;
+	/** Сколько ждём после «бутылки кончились», прежде чем выйти из мира. */
+	private static final int EXIT_DELAY_TICKS = 200;
 
 	/** Еда, которую не трогаем: вредная или слишком ценная. */
 	private static final Set<Item> FOOD_BLACKLIST = Set.of(
@@ -64,6 +67,7 @@ public final class AobController {
 	private static final Set<UUID> countedVictories = new HashSet<>();
 
 	private static boolean warnedNoBottles;
+	private static int noBottleTicks;
 	private static boolean warnedNoFood;
 
 	private AobController() {
@@ -114,10 +118,15 @@ public final class AobController {
 	}
 
 	private static void tickActions(Minecraft mc, LocalPlayer player, AobConfig config) {
-
 		if (!config.enabled) {
 			if (using != null) stopUsing(mc, player);
 			state = State.IDLE;
+			return;
+		}
+
+		if (config.lowHealthDisable && player.getHealth() <= config.lowHealth && !player.isDeadOrDying()) {
+			AutoOminousBottleClient.disable(Component.translatable("autoominousbottle.msg.off_low_health"));
+			warn(player, null);
 			return;
 		}
 
@@ -172,12 +181,23 @@ public final class AobController {
 			state = State.NO_BOTTLES;
 			if (!warnedNoBottles) {
 				warnedNoBottles = true;
-				warn(player, Component.translatable("autoominousbottle.msg.no_bottles"));
+				noBottleTicks = 0;
+				warn(player, Component.translatable(config.exitWhenOutOfBottles
+						? "autoominousbottle.msg.no_bottles_exit" : "autoominousbottle.msg.no_bottles"));
+			}
+			if (config.exitWhenOutOfBottles && ++noBottleTicks >= EXIT_DELAY_TICKS) {
+				exitWorld(mc);
 			}
 			return;
 		}
 		warnedNoBottles = false;
 		startUsing(mc, player, Action.DRINK, slot);
+	}
+
+	/** Бутылки кончились: выключаемся и выходим из мира, чтобы не стоять зря. */
+	private static void exitWorld(Minecraft mc) {
+		AutoOminousBottleClient.disable(Component.translatable("autoominousbottle.msg.off"));
+		mc.disconnectFromWorld(ClientLevel.DEFAULT_QUIT_MESSAGE);
 	}
 
 	public static int countBottles(LocalPlayer player) {
@@ -320,7 +340,7 @@ public final class AobController {
 	}
 
 	private static void warn(LocalPlayer player, Component message) {
-		player.sendSystemMessage(message);
+		if (message != null) player.sendSystemMessage(message);
 		player.playSound(SoundEvents.NOTE_BLOCK_PLING.value(), 1.0F, 0.6F);
 	}
 }

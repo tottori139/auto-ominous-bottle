@@ -16,6 +16,7 @@ public class AobConfigScreen extends Screen {
 	private static final List<Integer> DRINK_DELAYS = List.of(3, 5, 10, 20, 30);
 	private static final List<Integer> EAT_THRESHOLDS = List.of(6, 10, 14, 18);
 	private static final List<Integer> JUMP_INTERVALS = List.of(0, 1, 3, 5);
+	private static final List<Integer> LOW_HEALTH_VALUES = List.of(4, 6, 8, 10, 14);
 	private static final int BUTTON_WIDTH = 150;
 	private static final int BUTTON_HEIGHT = 20;
 	private static final int COLUMN_GAP = 10;
@@ -36,6 +37,7 @@ public class AobConfigScreen extends Screen {
 		if (!DRINK_DELAYS.contains(config.drinkDelaySeconds)) config.drinkDelaySeconds = 5;
 		if (!EAT_THRESHOLDS.contains(config.eatBelowFood)) config.eatBelowFood = 14;
 		if (!JUMP_INTERVALS.contains(config.jumpIntervalSeconds)) config.jumpIntervalSeconds = 1;
+		if (!LOW_HEALTH_VALUES.contains(config.lowHealth)) config.lowHealth = 6;
 		slot = 0;
 
 		// Слева: что делает мод. Справа: его параметры.
@@ -71,6 +73,17 @@ public class AobConfigScreen extends Screen {
 		place(CycleButton.<Integer>builder(AobConfigScreen::jumpIntervalText, config.jumpIntervalSeconds)
 				.withValues(JUMP_INTERVALS)
 				.create(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.jump_interval"), (button, value) -> config.jumpIntervalSeconds = value));
+
+		place(CycleButton.onOffBuilder(config.lowHealthDisable)
+				.withTooltip(value -> Tooltip.create(Component.translatable("autoominousbottle.config.low_health_disable.tip")))
+				.create(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.low_health_disable"), (button, value) -> config.lowHealthDisable = value));
+		place(CycleButton.<Integer>builder(hp -> Component.translatable("autoominousbottle.config.hearts", hp / 2), config.lowHealth)
+				.withValues(LOW_HEALTH_VALUES)
+				.create(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.low_health"), (button, value) -> config.lowHealth = value));
+
+		place(CycleButton.onOffBuilder(config.exitWhenOutOfBottles)
+				.withTooltip(value -> Tooltip.create(Component.translatable("autoominousbottle.config.exit_no_bottles.tip")))
+				.create(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.exit_no_bottles"), (button, value) -> config.exitWhenOutOfBottles = value));
 
 		place(Button.builder(Component.translatable("autoominousbottle.config.reset", config.raidsWon), button -> {
 			config.raidsWon = 0;

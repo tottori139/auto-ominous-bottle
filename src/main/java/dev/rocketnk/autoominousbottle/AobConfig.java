@@ -17,6 +17,10 @@ public class AobConfig {
 	public boolean confirmEnable = true;
 	/** Выключать мод после перезахода, смены измерения и смерти. */
 	public boolean autoDisable = true;
+	/** Выключать мод, когда здоровье упало до lowHealth (в единицах HP, 2 HP = 1 сердце). */
+	public boolean lowHealthDisable = true;
+	public int lowHealth = 6;
+	public boolean exitWhenOutOfBottles = false;
 	public boolean autoDrink = true;
 	public boolean autoEat = true;
 	public boolean showHud = true;

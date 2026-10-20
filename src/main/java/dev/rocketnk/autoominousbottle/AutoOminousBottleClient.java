@@ -55,6 +55,10 @@ public class AutoOminousBottleClient implements ClientModInitializer {
 		setEnabled(enabled, Component.translatable(enabled ? "autoominousbottle.msg.on" : "autoominousbottle.msg.off"));
 	}
 
+	public static void disable(Component message) {
+		setEnabled(false, message);
+	}
+
 	private static void setEnabled(boolean enabled, Component message) {
 		config.enabled = enabled;
 		config.save();
