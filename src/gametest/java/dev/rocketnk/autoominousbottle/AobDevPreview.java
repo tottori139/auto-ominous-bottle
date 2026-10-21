@@ -1,5 +1,7 @@
 package dev.rocketnk.autoominousbottle;
 
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -7,9 +9,9 @@ import net.minecraft.client.gui.screens.TitleScreen;
 /**
  * Только для разработки (gradlew runPreview): открывает настройки, по очереди показывает каждую вкладку,
  * сохраняет скриншоты в run/screenshots и закрывает игру. На вкладке анимации снимает ещё и улыбку.
- * В обычной игре не включается.
+ * Лежит в тестовом наборе, в выпущенный jar не попадает; включается только флагом из run-конфигурации.
  */
-final class AobDevPreview {
+public final class AobDevPreview implements ClientModInitializer {
 	static final boolean ENABLED = Boolean.getBoolean("autoominousbottle.devPreview");
 
 	private static final int TICKS_PER_SHOT = 20;
@@ -21,7 +23,9 @@ final class AobDevPreview {
 	private static int tab;
 	private static boolean smileShot;
 
-	private AobDevPreview() {
+	@Override
+	public void onInitializeClient() {
+		if (ENABLED) ClientTickEvents.END_CLIENT_TICK.register(AobDevPreview::tick);
 	}
 
 	static void tick(Minecraft mc) {

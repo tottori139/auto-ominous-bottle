@@ -5,7 +5,8 @@
 	"name": "Auto Ominous Bottle tests",
 	"environment": "client",
 	"entrypoints": {
-		"fabric-client-gametest": ["dev.rocketnk.autoominousbottle.test.AobClientGameTest"]
+		"fabric-client-gametest": ["dev.rocketnk.autoominousbottle.test.AobClientGameTest"],
+		"client": ["dev.rocketnk.autoominousbottle.AobDevPreview"]
 	},
 	"depends": {
 		"autoominousbottle": "*"

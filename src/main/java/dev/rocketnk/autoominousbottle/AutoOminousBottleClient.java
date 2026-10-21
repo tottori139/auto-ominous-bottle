@@ -48,7 +48,6 @@ public class AutoOminousBottleClient implements ClientModInitializer {
 			}
 			checkAutoDisable(client);
 			AobController.tick(client);
-			if (AobDevPreview.ENABLED) AobDevPreview.tick(client);
 		});
 
 		HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(MOD_ID, "hud"), AobHud::extract);
@@ -66,8 +65,16 @@ public class AutoOminousBottleClient implements ClientModInitializer {
 		}
 	}
 
-	public static KeyMapping toggleKey() {
-		return toggleKey;
+	/**
+	 * Название клавиши мода. Для букв и цифр — физическая клавиша (K), а не символ раскладки:
+	 * игра на русской раскладке показала бы «Л», хотя нажимать надо ту же K.
+	 */
+	public static Component toggleKeyName() {
+		InputConstants.Key key = KeyMappingHelper.getBoundKeyOf(toggleKey);
+		int code = key.getValue();
+		boolean letterOrDigit = (code >= GLFW.GLFW_KEY_A && code <= GLFW.GLFW_KEY_Z) || (code >= GLFW.GLFW_KEY_0 && code <= GLFW.GLFW_KEY_9);
+		if (key.getType() == InputConstants.Type.KEYSYM && letterOrDigit) return Component.literal(String.valueOf((char) code));
+		return toggleKey.getTranslatedKeyMessage();
 	}
 
 	public static void setEnabled(boolean enabled) {
@@ -100,7 +107,7 @@ public class AutoOminousBottleClient implements ClientModInitializer {
 		}
 		confirmTicksLeft = CONFIRM_TICKS;
 		AobSounds.play(AobSounds.CONFIRM);
-		AobHud.showMessage(Component.translatable("autoominousbottle.msg.confirm", toggleKey.getTranslatedKeyMessage()));
+		AobHud.showMessage(Component.translatable("autoominousbottle.msg.confirm", toggleKeyName()));
 	}
 
 	/** После перезахода, смены измерения или смерти мод выключается, если это не отключено в настройках. */

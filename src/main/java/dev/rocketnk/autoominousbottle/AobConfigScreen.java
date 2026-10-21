@@ -120,7 +120,7 @@ public class AobConfigScreen extends Screen {
 		int half = (CONTENT_WIDTH - TAB_GAP) / 2;
 		int y = nextRowY();
 		addRenderableWidget(Button.builder(
-						Component.translatable("autoominousbottle.config.keybind", AutoOminousBottleClient.toggleKey().getTranslatedKeyMessage()),
+						Component.translatable("autoominousbottle.config.keybind", AutoOminousBottleClient.toggleKeyName()),
 						button -> minecraft.gui.setScreen(new KeyBindsScreen(this, minecraft.options)))
 				.bounds(left, y, half, BUTTON_HEIGHT)
 				.tooltip(Tooltip.create(Component.translatable("autoominousbottle.config.keybind.tip")))
@@ -162,6 +162,20 @@ public class AobConfigScreen extends Screen {
 		toggle("auto_drink", () -> config.autoDrink, value -> config.autoDrink = value);
 		slider("drink_delay", 3, 60, 1, config.drinkDelaySeconds,
 				seconds -> Component.translatable("autoominousbottle.config.seconds", seconds), value -> config.drinkDelaySeconds = value);
+
+		// Остановка по условию: после N рейдов и/или через X времени с момента включения.
+		slider("stop_after_raids", 0, 100, 1, config.stopAfterRaids,
+				raids -> raids == 0 ? Component.translatable("autoominousbottle.config.never") : Component.literal(String.valueOf(raids)),
+				value -> config.stopAfterRaids = value);
+		slider("stop_after_minutes", 0, 720, 15, config.stopAfterMinutes,
+				minutes -> minutes == 0 ? Component.translatable("autoominousbottle.config.never") : AobController.formatMinutes(minutes),
+				value -> config.stopAfterMinutes = value);
+		if (config.stopAction == null) config.stopAction = AobConfig.StopAction.DISABLE;
+		add(CycleButton.<AobConfig.StopAction>builder(
+						value -> Component.translatable("autoominousbottle.config.stop_action." + value.name().toLowerCase()), config.stopAction)
+				.withValues(AobConfig.StopAction.values())
+				.create(left, nextRowY(), CONTENT_WIDTH, BUTTON_HEIGHT, Component.translatable("autoominousbottle.config.stop_action"),
+						(button, value) -> config.stopAction = value));
 	}
 
 	private void initFood(AobConfig config) {

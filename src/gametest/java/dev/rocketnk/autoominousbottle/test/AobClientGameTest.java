@@ -1,6 +1,7 @@
 package dev.rocketnk.autoominousbottle.test;
 
 import dev.rocketnk.autoominousbottle.AobConfig;
+import dev.rocketnk.autoominousbottle.AobController;
 import dev.rocketnk.autoominousbottle.AutoOminousBottleClient;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -42,8 +43,42 @@ public class AobClientGameTest implements FabricClientGameTest {
 			testAutoEat(context, server);
 			testDrinksOneBottle(context, server);
 			testJumpStopsOnRaidOmen(context, server);
+			testStopAfterRaids(context);
+			testStopAfterTime(context);
 			screenshotHud(context, server);
 		}
+	}
+
+	/** «Остановиться после 2 рейдов»: после первой победы мод работает, после второй — выключается. */
+	private void testStopAfterRaids(ClientGameTestContext context) {
+		configure(context, config -> {
+			config.autoDrink = false;
+			config.autoEat = false;
+			config.stopAfterRaids = 2;
+			config.stopAction = AobConfig.StopAction.DISABLE;
+		});
+		enable(context);
+		context.runOnClient(mc -> AobController.onRaidWon(mc, AutoOminousBottleClient.config));
+		check(context.computeOnClient(mc -> AutoOminousBottleClient.config.enabled), "остановка: после 1 рейда из 2 мод работает");
+		context.runOnClient(mc -> AobController.onRaidWon(mc, AutoOminousBottleClient.config));
+		check(!context.computeOnClient(mc -> AutoOminousBottleClient.config.enabled), "остановка: после 2 рейдов мод выключился");
+		configure(context, config -> config.stopAfterRaids = 0);
+	}
+
+	/** «Остановиться через 1 мин»: через минуту с включённым модом он выключается. */
+	private void testStopAfterTime(ClientGameTestContext context) {
+		configure(context, config -> {
+			config.autoDrink = false;
+			config.autoEat = false;
+			config.stopAfterMinutes = 1;
+			config.stopAction = AobConfig.StopAction.DISABLE;
+		});
+		enable(context);
+		context.waitTicks(1100);
+		check(context.computeOnClient(mc -> AutoOminousBottleClient.config.enabled), "таймер: через 55 с мод ещё работает");
+		context.waitTicks(150);
+		check(!context.computeOnClient(mc -> AutoOminousBottleClient.config.enabled), "таймер: через минуту мод выключился");
+		configure(context, config -> config.stopAfterMinutes = 0);
 	}
 
 	/** Снимки HUD в разных видах и местах — смотреть глазами в run/screenshots. */
@@ -171,6 +206,8 @@ public class AobClientGameTest implements FabricClientGameTest {
 			config.autoDisable = false;
 			config.autoJump = false;
 			config.exitWhenOutOfBottles = false;
+			config.stopAfterRaids = 0;
+			config.stopAfterMinutes = 0;
 			change.accept(config);
 		});
 	}

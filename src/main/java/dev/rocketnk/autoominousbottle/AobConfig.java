@@ -24,6 +24,9 @@ public class AobConfig {
 
 	public enum AnimationPosition { ABOVE_HOTBAR, CENTER, TOP }
 
+	/** Что делать, когда сработало условие остановки. */
+	public enum StopAction { DISABLE, EXIT_WORLD }
+
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("autoominousbottle.json");
 
@@ -36,6 +39,11 @@ public class AobConfig {
 	public boolean lowHealthDisable = true;
 	public int lowHealth = 6;
 	public boolean exitWhenOutOfBottles = false;
+	/** Остановиться после стольких рейдов с момента включения, 0 — не останавливаться. */
+	public int stopAfterRaids = 0;
+	/** Остановиться через столько минут после включения, 0 — не останавливаться. */
+	public int stopAfterMinutes = 0;
+	public StopAction stopAction = StopAction.DISABLE;
 	/** Бутылочка с глазами при включении мода. */
 	public boolean animation = true;
 	/** И ещё каждый раз, когда мод начинает пить бутылку. */

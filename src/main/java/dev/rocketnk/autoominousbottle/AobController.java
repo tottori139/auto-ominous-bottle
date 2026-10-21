@@ -70,6 +70,10 @@ public final class AobController {
 	private static boolean raidBarVisible;
 	private static final Set<UUID> countedVictories = new HashSet<>();
 
+	private static int sessionRaids;
+	private static int sessionTicks;
+	private static final int TICKS_PER_MINUTE = 1200;
+
 	private static boolean warnedNoBottles;
 	private static int noBottleTicks;
 	private static boolean warnedNoFood;
@@ -101,6 +105,13 @@ public final class AobController {
 		failedDrinks = 0;
 		warnedNoBottles = false;
 		warnedNoFood = false;
+		sessionRaids = 0;
+		sessionTicks = 0;
+	}
+
+	/** Рейдов пройдено с момента включения мода. */
+	public static int sessionRaids() {
+		return sessionRaids;
 	}
 
 	public static void tick(Minecraft mc) {
@@ -127,6 +138,13 @@ public final class AobController {
 		if (!config.enabled) {
 			if (using != null) stopUsing(mc, player);
 			state = State.IDLE;
+			return;
+		}
+
+		// Таймер остановки считает только время, пока игра не на паузе.
+		if (!mc.isPaused()) sessionTicks++;
+		if (config.stopAfterMinutes > 0 && sessionTicks >= config.stopAfterMinutes * TICKS_PER_MINUTE) {
+			stop(mc, Component.translatable("autoominousbottle.msg.stop_time", formatMinutes(config.stopAfterMinutes)));
 			return;
 		}
 
@@ -192,7 +210,7 @@ public final class AobController {
 						? "autoominousbottle.msg.no_bottles_exit" : "autoominousbottle.msg.no_bottles"));
 			}
 			if (config.exitWhenOutOfBottles && ++noBottleTicks >= EXIT_DELAY_TICKS) {
-				exitWorld(mc);
+				exitWorld(mc, Component.translatable("autoominousbottle.msg.off"));
 			}
 			return;
 		}
@@ -200,10 +218,41 @@ public final class AobController {
 		startUsing(mc, player, Action.DRINK, slot);
 	}
 
-	/** Бутылки кончились: выключаемся и выходим из мира, чтобы не стоять зря. */
-	private static void exitWorld(Minecraft mc) {
-		AutoOminousBottleClient.disable(Component.translatable("autoominousbottle.msg.off"));
+	/** Выключаемся и выходим из мира, чтобы не стоять зря. */
+	private static void exitWorld(Minecraft mc, Component message) {
+		AutoOminousBottleClient.disable(message);
 		mc.disconnectFromWorld(ClientLevel.DEFAULT_QUIT_MESSAGE);
+	}
+
+	/** Сработало условие остановки (N рейдов или X времени): выключиться или выйти из мира — как в настройках. */
+	private static void stop(Minecraft mc, Component message) {
+		if (AutoOminousBottleClient.config.stopAction == AobConfig.StopAction.EXIT_WORLD) {
+			exitWorld(mc, message);
+		} else {
+			AutoOminousBottleClient.disable(message);
+		}
+	}
+
+	/** «1 ч 30 мин» / «45 мин» на языке игры. */
+	public static Component formatMinutes(int minutes) {
+		int hours = minutes / 60;
+		int rest = minutes % 60;
+		if (hours == 0) return Component.translatable("autoominousbottle.time.minutes", rest);
+		if (rest == 0) return Component.translatable("autoominousbottle.time.hours", hours);
+		return Component.translatable("autoominousbottle.time.hours_minutes", hours, rest);
+	}
+
+	/** Рейд выигран: общий счётчик, счётчик сессии и, если набрали сколько нужно, остановка. */
+	public static void onRaidWon(Minecraft mc, AobConfig config) {
+		config.raidsWon++;
+		config.save();
+		if (!config.enabled) return;
+		sessionRaids++;
+		say(Component.translatable("autoominousbottle.msg.raid_won", config.raidsWon));
+		AobSounds.play(AobSounds.RAID_WON);
+		if (config.stopAfterRaids > 0 && sessionRaids >= config.stopAfterRaids) {
+			stop(mc, Component.translatable("autoominousbottle.msg.stop_raids", sessionRaids));
+		}
 	}
 
 	public static int countBottles(LocalPlayer player) {
@@ -271,12 +320,7 @@ public final class AobController {
 			if (!hasTranslationKey(name, "event.minecraft.raid")) continue;
 			visible = true;
 			if (hasTranslationKey(name, "event.minecraft.raid.victory") && countedVictories.add(entry.getKey())) {
-				config.raidsWon++;
-				config.save();
-				if (config.enabled) {
-					say(Component.translatable("autoominousbottle.msg.raid_won", config.raidsWon));
-					AobSounds.play(AobSounds.RAID_WON);
-				}
+				onRaidWon(mc, config);
 			}
 		}
 		countedVictories.retainAll(events.keySet());

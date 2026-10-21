@@ -43,6 +43,7 @@ loom {
 		preview {
 			client()
 			name = "Preview"
+			source "gametest"
 			vmArg "-Dautoominousbottle.devPreview=true"
 		}
 	}
