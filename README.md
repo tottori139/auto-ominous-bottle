@@ -23,7 +23,8 @@ When a raid ends, it drinks the next Ominous Bottle for you, so the next raid st
 ## How to use
 
 1. Install [Fabric Loader](https://fabricmc.net/use/) for Minecraft 26.2 and [Fabric API](https://modrinth.com/mod/fabric-api).
-2. Put `auto-ominous-bottle-<version>.jar` into your `mods` folder.
+2. Download `auto-ominous-bottle-<version>.jar` from [Releases](https://github.com/tottori139/auto-ominous-bottle/releases)
+   and put it into your `mods` folder.
    [Mod Menu](https://modrinth.com/mod/modmenu) is optional but recommended — it gives you the settings screen.
 3. Put Ominous Bottles (and some food) anywhere in your inventory and stand in your raid farm.
 4. Press **K twice** (within 3 seconds) to turn the mod on — a status icon shows up in the top-left corner.
@@ -75,6 +76,8 @@ gradlew runPreview         # opens the settings screen and saves screenshots of 
 
 Needs a JDK 25 somewhere Gradle can find it (`JAVA_HOME`, or a JDK installed by IntelliJ / your OS).
 GitHub Actions builds every push (`.github/workflows/build.yml`) and keeps the jar as an artifact.
+To publish a release, bump `version` in `gradle.properties`, commit, then push a matching tag:
+`git tag v1.10.0 && git push origin v1.10.0` — `release.yml` builds the jar and attaches it to the release.
 
 ## A word from the dev
 

@@ -1,0 +1,39 @@
+# Push a tag like v1.10.0 — GitHub builds the mod and publishes a release with the jar attached.
+name: release
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+      - name: check that the tag matches the mod version
+        run: |
+          version=$(grep '^version=' gradle.properties | cut -d= -f2)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match version=$version in gradle.properties"
+            exit 1
+          fi
+      - name: setup jdk
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+      - name: build
+        run: ./gradlew build
+      - name: publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Auto Ominous Bottle ${{ github.ref_name }}
+          files: build/libs/auto-ominous-bottle-*.jar
+          generate_release_notes: true
+          body: |
+            Fabric mod for Minecraft 26.2. Requires Fabric API, Mod Menu is optional.
+            Put the jar into your `mods` folder, press K twice in game to turn it on. See the README for details.
