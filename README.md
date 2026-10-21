@@ -78,8 +78,10 @@ GitHub Actions builds every push (`.github/workflows/build.yml`) and keeps the j
 
 ## A word from the dev
 
-I didn't write a single line of this Java — I told Claude what I wanted and playtested it in my raid farm
-until it worked. Vibe-coded it, boys. Tested, works great. 🤙 Something broke? Open an issue.
+I didn't write a single line of this Java myself. I told Claude what I wanted, it wrote the code,
+and I playtested it in my raid farm until it stopped doing dumb stuff. So yes, it's vibe-coded —
+but it's tested: there are in-game tests for eating, drinking exactly one bottle and putting your sword back.
+Something broke? Open an issue.
 
 ## Credits
 
