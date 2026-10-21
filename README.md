@@ -15,6 +15,7 @@ When a raid ends, it drinks the next Ominous Bottle for you, so the next raid st
 - **Puts things back** — bottles and food are taken from the hotbar or inventory; your sword goes back to your hand.
 - **Safety** — turns on only with a double key press, turns off after rejoining, changing dimension, dying
   or at low health, and can leave the world when bottles run out.
+- **Stop when you want** — after N raids and/or after X hours, then turn the mod off or leave the world.
 - **Status on screen** — animated icon + raid/bottle counter in any of 8 positions, or a compact one-line text mode.
 - **Raid counter**, sounds, a little Ominous Bottle mascot animation, English / Русский / Українська.
 
@@ -33,7 +34,7 @@ When a raid ends, it drinks the next Ominous Bottle for you, so the next raid st
 | Tab | What's there |
 |---|---|
 | General | key confirmation, auto-off, low-health shutoff, leave world when out of bottles, key binding, reset counter |
-| Drinking | auto-drink, wait time after a raid |
+| Drinking | auto-drink, wait time after a raid, stop after N raids / X time, then turn off or leave the world |
 | Food | auto-eat, hunger threshold |
 | Jump | auto-jump, jump interval |
 | HUD | show/hide, style (icon + text / icon / text only), position, size, animations on/off/auto |
@@ -65,8 +66,12 @@ Everything can be replaced with your own pack:
 
 ```
 gradlew build              # jar in build/libs
-gradlew runClientGameTest  # in-game tests: eating, one bottle per raid, items put back, jump stop
+gradlew runClientGameTest  # in-game tests: eating, one bottle per raid, items put back, jump stop, stop conditions
+gradlew runPreview         # opens the settings screen and saves screenshots of every tab to run/screenshots
 ```
+
+Needs a JDK 25 somewhere Gradle can find it (`JAVA_HOME`, or a JDK installed by IntelliJ / your OS).
+GitHub Actions builds every push (`.github/workflows/build.yml`) and keeps the jar as an artifact.
 
 ## License
 
