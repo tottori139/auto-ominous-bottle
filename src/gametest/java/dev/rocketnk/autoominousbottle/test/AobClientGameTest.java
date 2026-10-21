@@ -103,7 +103,8 @@ public class AobClientGameTest implements FabricClientGameTest {
 			context.runOnClient(mc -> {
 				AutoOminousBottleClient.config.hudStyle = variant.style();
 				AutoOminousBottleClient.config.hudPosition = variant.position();
-				dev.rocketnk.autoominousbottle.AobHud.showMessage(net.minecraft.network.chat.Component.literal("Рейд пройден, всего 3"));
+				dev.rocketnk.autoominousbottle.AobHud.clearMessages();
+				dev.rocketnk.autoominousbottle.AobHud.showMessage(net.minecraft.network.chat.Component.translatable("autoominousbottle.msg.raid_won", AutoOminousBottleClient.config.raidsWon));
 			});
 			context.waitTicks(5);
 			context.takeScreenshot("aob_hud_" + variant.name());

@@ -73,6 +73,10 @@ public final class AobHud {
 		};
 	}
 
+	public static void clearMessages() {
+		MESSAGES.clear();
+	}
+
 	/** Сообщение мода рядом со статусом вместо чата. Держится несколько секунд и гаснет. */
 	public static void showMessage(Component text) {
 		MESSAGES.add(new Message(text, Util.getMillis()));
