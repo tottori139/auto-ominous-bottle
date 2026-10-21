@@ -3,16 +3,17 @@
 A small client-side Fabric mod for **Minecraft 26.2** that keeps your raid farm running while you're AFK.
 When a raid ends, it drinks the next Ominous Bottle for you, so the next raid starts on its own.
 
-> Vibe-coded with love 💜 — this whole mod was built by a vibe-code lover chatting with Claude (Anthropic's AI).
-> No hand-written Java was harmed in the making of it. Bugs? Open an issue and we'll vibe them away.
+> 💜 100% vibe-coded with Claude — see [a word from the dev](#a-word-from-the-dev).
 
 ## Features
 
 - **Auto-drink** — drinks an Ominous Bottle when the raid bar is gone and you have no Bad Omen / Raid Omen.
   Exactly one bottle at a time, never while an omen is active.
-- **Auto-eat** — eats when hunger drops to your threshold (skips rotten flesh, spider eyes, chorus fruit, golden apples).
+- **Auto-eat** — eats when hunger drops to your threshold. Never eats food that hurts you
+  (rotten flesh, spider eyes, pufferfish, poisonous potatoes, suspicious stew), chorus fruit or golden apples.
 - **Auto-jump** — optional, for farms where you have to jump to trigger the raid. Stops as soon as Raid Omen appears.
-- **Puts things back** — bottles and food are taken from the hotbar or inventory; your sword goes back to your hand.
+- **Puts things back** — bottles and food are taken from the hotbar or inventory; whatever you were holding
+  goes back to your hand.
 - **Safety** — turns on only with a double key press, turns off after rejoining, changing dimension, dying
   or at low health, and can leave the world when bottles run out.
 - **Stop when you want** — after N raids and/or after X hours, then turn the mod off or leave the world.
@@ -25,8 +26,8 @@ When a raid ends, it drinks the next Ominous Bottle for you, so the next raid st
 2. Put `auto-ominous-bottle-<version>.jar` into your `mods` folder.
    [Mod Menu](https://modrinth.com/mod/modmenu) is optional but recommended — it gives you the settings screen.
 3. Put Ominous Bottles (and some food) anywhere in your inventory and stand in your raid farm.
-4. Press **K twice** (within 3 seconds) to turn the mod on. Press **K** once to turn it off.
-   The key can be changed in *Controls → Auto Ominous Bottle*.
+4. Press **K twice** (within 3 seconds) to turn the mod on — a status icon shows up in the top-left corner.
+   Press **K** once to turn it off. The key can be changed in *Controls → Auto Ominous Bottle*.
 5. Go AFK. In singleplayer press **F3 + P** first, so the game doesn't pause when the window loses focus.
 
 ## Settings (Mod Menu → Auto Ominous Bottle)
@@ -60,7 +61,9 @@ Everything can be replaced with your own pack:
 ## Notes
 
 - Client-side only, works in singleplayer and on servers. Some servers don't allow automation — check the rules first.
-- The mod only presses keys the way you would; it doesn't send anything special to the server.
+- The mod only does what you could do with your own keyboard and mouse: use an item, move items between slots, jump.
+  It doesn't send anything special to the server.
+- Made for Minecraft 26.2 only.
 
 ## Building
 
@@ -72,6 +75,22 @@ gradlew runPreview         # opens the settings screen and saves screenshots of 
 
 Needs a JDK 25 somewhere Gradle can find it (`JAVA_HOME`, or a JDK installed by IntelliJ / your OS).
 GitHub Actions builds every push (`.github/workflows/build.yml`) and keeps the jar as an artifact.
+
+## A word from the dev
+
+Real talk: I didn't write a single line of this Java myself. I told Claude what I wanted in plain words,
+it wrote the code, and I playtested it in my raid farm until it stopped doing dumb stuff
+(like chugging three bottles at once 😅).
+
+So yeah, it's vibe-coded. But it's *tested* vibe-code — there are real in-game tests for eating,
+drinking exactly one bottle, putting your sword back and stopping on time. Vibe-coded it, boys. Works great. 🤙
+
+Something broke? Open an issue and I'll vibe a fix.
+
+## Credits
+
+- Made by [tottori139](https://github.com/tottori139), code written with Claude (Anthropic).
+- The Ominous Bottle mascot and icons are pixel art based on Minecraft's vanilla Ominous Bottle texture (© Mojang).
 
 ## License
 
